@@ -1,7 +1,8 @@
-import http from 'http';
-import parsePagedApi from './app/shopify-api-handler'
+let http = require ('http');
+let parsePagedApi = require('./app/shopify-api-handler');
 
 http.createServer((request, response) => {
     response.writeHead(200, { 'Content-Type': 'text/plain' });
-    response.end(parsePagedApi());
+    response.end("hello world2");
+    //response.end(parsePagedApi());
 }).listen(1337, '127.0.0.1');

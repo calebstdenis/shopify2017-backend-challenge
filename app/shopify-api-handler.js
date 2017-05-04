@@ -1,15 +1,15 @@
-import http from 'http';
-import R from 'rambda';
+let http = require('http');
+let R = require('rambda');
 
-export const parsePaginatedJSON = function(endpoint) {
+module.exports = {
+parsePaginatedJSON: function(endpoint) {
     // R.range(1, getLastPage(endpoint))
     // .map(parseApiPage(endpoint))
     // .all();
-};
+},
+getLastPage: function(endpoint) { },
 
-let getLastPage = function(endpoint) { };
-
-let parseApiPage = R.curry(function(endpoint, pageNum) {
+parseApiPage: R.curry(function(endpoint, pageNum) {
     // let parsedData;
     // http.get(`${endpoint}?page=${pageNum}`, (res) => {
     //     let rawData;
@@ -22,4 +22,5 @@ let parseApiPage = R.curry(function(endpoint, pageNum) {
     //         }
     //     });
     // });
-});
+}),
+} 
