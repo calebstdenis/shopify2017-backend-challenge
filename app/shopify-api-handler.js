@@ -1,5 +1,5 @@
 let http = require('http');
-let R = require('rambda');
+let R = require('ramda');
 
 module.exports = {
 parsePaginatedJSON: function(endpoint) {
