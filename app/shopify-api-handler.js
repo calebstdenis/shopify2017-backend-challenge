@@ -13,7 +13,6 @@ getLastPage: function(endpoint) { },
 
 getJSONFromPage: R.curry(function(endpoint, pageNum) {
     return new Promise(function(resolve, reject) {
-        let parsedData;
         http.get(`${endpoint}?page=${pageNum}`, (res) => {
             let rawData = "";
             res.on('data', (chunk) => rawData += chunk);
