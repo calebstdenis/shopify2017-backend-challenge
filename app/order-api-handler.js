@@ -3,7 +3,7 @@ let R = require('ramda');
 let Promise = require('es6-promise').Promise;
 
 module.exports = {
-parsePaginatedJSON: function(endpoint) {
+parsePaginatedOrders: function(endpoint) {
     // R.range(1, getLastPage(endpoint))
     // .map(getJSON(endpoint))
     // .all();

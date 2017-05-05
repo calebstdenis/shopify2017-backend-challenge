@@ -1,5 +1,5 @@
 let http = require ('http');
-let parsePagedApi = require('./app/shopify-api-handler');
+let parsePagedApi = require('./app/order-api-handler');
 
 http.createServer((request, response) => {
     response.writeHead(200, { 'Content-Type': 'text/plain' });
