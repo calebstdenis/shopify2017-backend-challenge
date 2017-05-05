@@ -8,6 +8,7 @@
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "es6-promise": "^4.1.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.3.0",
     "nodemon": "^1.11.0",
     "ramda": "^0.23.0",
@@ -17,7 +18,8 @@
   "scripts": {
     "debug": "node --nolazy --debug-brk=5858 index.js",
     "start": "nodemon index.js",
-    "test": "mocha test"
+    "test": "mocha --watch",
+    "test-coverage": "istanbul cover node_modules/mocha/bin/_mocha"
   },
   "author": "Caleb St-Denis",
   "license": "ISC"

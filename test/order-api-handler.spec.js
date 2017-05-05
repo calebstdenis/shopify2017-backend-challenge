@@ -13,10 +13,18 @@ chai.use(sinonChai);
 require('chai').should();
 
 describe("Shopify Paginated API Handler", () => {
-    let httpGetStub = sinon.stub(http, "get");
+    let httpGetStub;
 
-    after(() => {
+    before(() => {
+        httpGetStub = sinon.stub(http, "get");
+    });
+
+    afterEach(() => {
         httpGetStub.reset();
+    });
+ 
+    after(() => {
+        http.get.restore();
     });
     
     describe("getJSON", () => {

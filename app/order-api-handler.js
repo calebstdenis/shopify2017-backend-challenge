@@ -11,13 +11,6 @@ parsePaginatedOrders: function(endpoint) {
     return Promise.all(promisedData).then(this.consolidatePagedData);
 },
 
-consolidatePagedOrders: function(pages) {
-    let allOrders = pages.map(page => page.orders)
-    let consolidatedData = Object.assign({}, pages[0], { orders: [].concat(allOrders) });
-    delete consolidatedData.pagination;
-    return consolidatedData;
-},
-
 getLastPage: function(endpoint) {
     return this.getJSONFromPage(endpoint)(1000000000).then(result => result.pagination.total)
 },
@@ -39,4 +32,15 @@ getJSONFromPage: R.curry(function(endpoint, pageNum) {
         });
     })
 }),
+
+consolidatePagedOrders: function(pages) {
+    let allOrders = pages.map(page => page.orders)
+    let consolidatedData = Object.assign(
+        {}, 
+        pages[0], 
+        { orders: [].concat(allOrders) }
+    );
+    delete consolidatedData.pagination;
+    return consolidatedData;
+},
 } 

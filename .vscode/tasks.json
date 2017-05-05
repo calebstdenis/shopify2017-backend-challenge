@@ -13,20 +13,27 @@
             "command": "npm",
             "taskName": "start",
             "args": ["start"],
-            "isShellCommand": true
+            "isShellCommand": true,
+            "isBackground": true
         },
         {
             "command": "npm",
             "taskName": "test",
             "args": ["test"],
-            "isShellCommand": true
+            "isShellCommand": true,
+            "isBackground": true
         },
         {
-            "command": "npm",
             "taskName": "build",
-            "args": ["build"],
+            "dependsOn": ["start", "test"],
             "isShellCommand": true,
             "isBuildCommand": true
+        },
+        {
+            "taskName": "test-coverage",
+            "command": "npm",
+            "args": ["run", "test-coverage"],
+            "isShellCommand": true
         }
     ]
 }
