@@ -47,7 +47,7 @@ describe("Shopify Paginated API Handler", () => {
             const responseData = Object.assign({}, testData); 
             responseData.orders = [];
             responseData.pagination.total = 10;
-            
+
             httpResponse = new PassThrough();
             httpGetStub.callsArgWith(1, httpResponse);
             httpResponse.write(JSON.stringify(responseData));
@@ -65,23 +65,46 @@ describe("Shopify Paginated API Handler", () => {
         });
     });
 
+    describe("consolidatePagedOrders", () => {
+        const fakeOrdersPage1 = [{id: "fakeorder1"}]
+            , fakeOrdersPage2 = [{id: "fakeorder2"}];
+        let result;
+
+        before(() => {
+            const dataPage1 = Object.assign({}, testData, { orders: fakeOrdersPage1 })
+            , dataPage2 = Object.assign({}, testData, { orders: fakeOrdersPage2 });
+
+            result = sut.consolidatePagedOrders([dataPage1, dataPage2]);
+        });
+
+        it("should merge orders from multiple different pages", () => {
+            result.orders.should.include.members([fakeOrdersPage1, fakeOrdersPage2]);
+        });
+        
+        it("should strip pagination data", () => {
+            result.should.not.have.property("pagination");
+        });
+
+        it("should also return the data shared among pages", () => {
+            result.should.have.property("available_cookies", testData["available_cookies"]);
+        });
+    })
+
     describe("parsePaginatedJSON", () => {
         let result;
 
-        const fakeOrdersPage1 = [{id: "fakeorder1"}];
-        const fakeOrdersPage2 = [{id: "fakeorder2"}];
+        const fakeOrdersPage1 = [{id: "fakeorder1"}]
+        , fakeOrdersPage2 = [{id: "fakeorder2"}];
 
         before(() => {
-            const dataPage1 = Object.assign({}, testData);
-            const dataPage2 = Object.assign({}, testData);
-            const dataPageBillion = Object.assign({}, testData);
-            dataPage1.orders = fakeOrdersPage1;
-            dataPage2.orders = fakeOrdersPage2;
+            const dataPage1 = Object.assign({}, testData, {orders: fakeOrdersPage1})
+            , dataPage2 = Object.assign({}, testData, {orders: fakeOrdersPage2})
+            , dataPageBillion = Object.assign({}, testData)
             dataPageBillion.pagination.total = 2;
 
-            const responsePage1 = new PassThrough();
-            const responsePage2 = new PassThrough();
-            const responsePageBillion = new PassThrough();
+            const responsePage1 = new PassThrough()
+            , responsePage2 = new PassThrough()
+            , responsePageBillion = new PassThrough();
 
             httpGetStub.withArgs(sinon.match.string, 1).callsArgWith(1, responsePage1);
             httpGetStub.withArgs(sinon.match.string, 2).callsArgWith(1, responsePage2);
@@ -94,17 +117,10 @@ describe("Shopify Paginated API Handler", () => {
             result = sut.parsePaginatedOrders("http://fakeapi.com/orders.json");
         })
 
-        it("should consolidate paged JSON into a single array of orders", () => {
+        it("should return promise with the consolidated data from the paginated API", () => {
             let expectedOrders = fakeOrdersPage1.concat(fakeOrdersPage2);
-            result.should.have.members(expectedOrders);
-        });
-        
-        it("should strip pagination data", () => {
-            result.should.not.have.property("pagination");
-        });
-
-        it("should also return the data shared among pages (e.g. available cookies)", () => {
-            result.should.have.property("available_cookies", testData["available_cookies"]);
+            result.should.eventually.have.members(expectedOrders);
+            result.should.eventually.have.property("available_cookies", testData["available_cookies"]);
         });
     });
 });
