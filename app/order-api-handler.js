@@ -8,8 +8,9 @@ parsePaginatedOrders: function(endpoint) {
     // .map(getJSON(endpoint))
     // .all();
 },
-getLastPage: function(endpoint) { },
-
+getLastPage: function(endpoint) {
+    return this.getJSONFromPage(endpoint)(1000000000).then(result => result.pagination.total)
+},
 
 getJSONFromPage: R.curry(function(endpoint, pageNum) {
     return new Promise(function(resolve, reject) {
