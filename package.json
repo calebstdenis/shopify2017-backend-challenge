@@ -9,7 +9,7 @@
     "chai-as-promised": "^6.0.0",
     "es6-promise": "^4.1.0",
     "eslint": "^3.19.0",
-    "istanbul": "^0.4.5",
+    "istanbul": "^1.1.0-alpha.1",
     "mocha": "^3.3.0",
     "nodemon": "^1.11.0",
     "ramda": "^0.23.0",
@@ -17,10 +17,10 @@
     "sinon-chai": "^2.10.0"
   },
   "scripts": {
-    "debug": "node --nolazy --debug-brk=5858 index.js",
-    "start": "nodemon index.js",
-    "test": "mocha --watch",
-    "test-coverage": "istanbul cover node_modules/mocha/bin/_mocha"
+    "debug": "node --harmony-async-await --nolazy --debug-brk=5858 index.js",
+    "start": "nodemon --harmony-async-await index.js",
+    "test": "mocha --harmony-async-await --watch",
+    "test-coverage": "istanbul cover ./node_modules/mocha/bin/_mocha"
   },
   "author": "Caleb St-Denis",
   "license": "ISC"

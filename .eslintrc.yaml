@@ -3,7 +3,7 @@ env:
   node: true
   mocha: true
 parserOptions:
-  ecmaVersion: 6
+  ecmaVersion: 8
   sourceType: module
 rules:
   semi: error

@@ -2,13 +2,13 @@ let http = require('http');
 let R = require('ramda');
 let Promise = require('es6-promise').Promise;
 
-exports.parsePaginatedOrders = function(endpoint) {
-    return this.getLastPage(endpoint).then(lastPage => {
-        return Promise.all(
-                R.range(1, lastPage+1)
-                .map(this.getJSONFromPage(endpoint))
-        ).then(orders => this.consolidatePagedOrders(orders));
-    });
+exports.parsePaginatedOrders = async function(endpoint) {
+    const lastPage = await this.getLastPage(endpoint);
+    const promisedApiPages = 
+        R.range(1, lastPage+1)
+        .map(this.getJSONFromPage(endpoint));
+
+    return Promise.all(promisedApiPages).then(this.consolidatePagedOrders);
 };
 
 exports.getLastPage = function(endpoint) {
