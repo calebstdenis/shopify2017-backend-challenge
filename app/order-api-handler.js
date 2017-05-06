@@ -12,7 +12,7 @@ parsePaginatedOrders: function(endpoint) {
 },
 
 getLastPage: function(endpoint) {
-    return this.getJSONFromPage(endpoint)(1000000000).then(result => result.pagination.total)
+    return this.getJSONFromPage(endpoint)(1000000000).then(result => result.pagination.total);
 },
 
 getJSONFromPage: R.curry(function(endpoint, pageNum) {
@@ -34,11 +34,11 @@ getJSONFromPage: R.curry(function(endpoint, pageNum) {
 }),
 
 consolidatePagedOrders: function(pages) {
-    let allOrders = pages.map(page => page.orders)
+    let ordersByPage = pages.map(page => page.orders)
     let consolidatedData = Object.assign(
         {}, 
         pages[0], 
-        { orders: [].concat(allOrders) }
+        { orders: [].concat(...ordersByPage) }
     );
     delete consolidatedData.pagination;
     return consolidatedData;

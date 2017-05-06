@@ -86,7 +86,7 @@ describe("Shopify Paginated API Handler", () => {
         });
 
         it("should merge orders from multiple different pages", () => {
-            result.orders.should.include.members([fakeOrdersPage1, fakeOrdersPage2]);
+            result.orders.should.include.members([...fakeOrdersPage1, ...fakeOrdersPage2]);
         });
         
         it("should strip pagination data", () => {
