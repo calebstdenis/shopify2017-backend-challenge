@@ -1,7 +1,7 @@
 const http = require('http');
 const PassThrough = require('stream').PassThrough;
 const testData = require ('./test-data');
-const sut = require('../app/order-api-handler')
+const sut = require('../app/order-api-handler');
 
 const sinon = require('sinon');
 const chai = require('chai');
@@ -31,12 +31,12 @@ describe("Shopify Paginated API Handler", () => {
         let result;
 
         before(() => {
-            httpResponse = new PassThrough();
-            httpGetStub.callsArgWith(1, httpResponse);
+            const httpResponse = new PassThrough();
+            httpGetStub.yields(httpResponse);
             httpResponse.write(JSON.stringify(testData));
             httpResponse.end();
 
-            result = sut.getJSONFromPage("http://fakeapi.com/orders.json")(1)
+            result = sut.getJSONFromPage("http://fakeapi.com/orders.json")(1);
         });
 
         it("should make a GET request to the given API page", () => {
@@ -56,12 +56,12 @@ describe("Shopify Paginated API Handler", () => {
             responseData.orders = [];
             responseData.pagination.total = 10;
 
-            httpResponse = new PassThrough();
-            httpGetStub.callsArgWith(1, httpResponse);
+            const httpResponse = new PassThrough();
+            httpGetStub.yields(httpResponse);
             httpResponse.write(JSON.stringify(responseData));
             httpResponse.end();
 
-            result = sut.getLastPage("http://fakeapi.com/orders.json")
+            result = sut.getLastPage("http://fakeapi.com/orders.json");
         });
         
         it("should make a GET request to an arbitrary non-valid page (#1,000,000,000) to get just the pagination data", () => {
@@ -74,13 +74,13 @@ describe("Shopify Paginated API Handler", () => {
     });
 
     describe("consolidatePagedOrders", () => {
-        const fakeOrdersPage1 = [{id: "fakeorder1"}]
-            , fakeOrdersPage2 = [{id: "fakeorder2"}];
+        const fakeOrdersPage1 = [{id: "fakeorder1"}];
+        const fakeOrdersPage2 = [{id: "fakeorder2"}];
         let result;
 
         before(() => {
-            const dataPage1 = Object.assign({}, testData, { orders: fakeOrdersPage1 })
-            , dataPage2 = Object.assign({}, testData, { orders: fakeOrdersPage2 });
+            const dataPage1 = Object.assign({}, testData, { orders: fakeOrdersPage1 });
+            const dataPage2 = Object.assign({}, testData, { orders: fakeOrdersPage2 });
 
             result = sut.consolidatePagedOrders([dataPage1, dataPage2]);
         });
@@ -96,39 +96,59 @@ describe("Shopify Paginated API Handler", () => {
         it("should also return the data shared among pages", () => {
             result.should.have.property("available_cookies", testData["available_cookies"]);
         });
-    })
+    });
 
     describe("parsePaginatedJSON", () => {
         let result;
 
-        const fakeOrdersPage1 = [{id: "fakeorder1"}]
-        , fakeOrdersPage2 = [{id: "fakeorder2"}];
-
+        const fakeApiEndpoint = "http://fakeapi.com/orders.json";
+        const fakeOrdersPage1 = [{id: "fakeorder1"}];
+        const fakeOrdersPage2 = [{id: "fakeorder2"}];
+        
         before(() => {
-            const dataPage1 = Object.assign({}, testData, {orders: fakeOrdersPage1})
-            , dataPage2 = Object.assign({}, testData, {orders: fakeOrdersPage2})
-            , dataPageBillion = Object.assign({}, testData)
+            const dataPage1 = Object.assign({}, testData, {orders: fakeOrdersPage1});
+            const dataPage2 = Object.assign({}, testData, {orders: fakeOrdersPage2});
+            const dataPageBillion = Object.assign({}, testData);
             dataPageBillion.pagination.total = 2;
 
-            const responsePage1 = new PassThrough()
-            , responsePage2 = new PassThrough()
-            , responsePageBillion = new PassThrough();
+            const responsePage1 = new PassThrough();
+            const responsePage2 = new PassThrough();
+            const responsePageBillion = new PassThrough();
 
-            httpGetStub.withArgs(sinon.match.string, 1).callsArgWith(1, responsePage1);
-            httpGetStub.withArgs(sinon.match.string, 2).callsArgWith(1, responsePage2);
-            httpGetStub.withArgs(sinon.match.string, 1000000000).callsArgWith(1, responsePageBillion);
+            httpGetStub.withArgs(`${fakeApiEndpoint}?page=1`).yields(responsePage1);
+            httpGetStub.withArgs(`${fakeApiEndpoint}?page=2`).yields(responsePage2);
+            httpGetStub.withArgs(`${fakeApiEndpoint}?page=1000000000`).yields(responsePageBillion);
 
             responsePage1.write(JSON.stringify(dataPage1));
             responsePage2.write(JSON.stringify(dataPage2));
             responsePageBillion.write(JSON.stringify(dataPageBillion));
+            responsePage1.end();
+            responsePage2.end();
+            responsePageBillion.end();
+
+            sinon.spy(sut, "getLastPage");
+            sinon.spy(sut, "getJSONFromPage");
+            sinon.spy(sut, "consolidatePagedOrders");
             
-            result = sut.parsePaginatedOrders("http://fakeapi.com/orders.json");
-        })
+            result = sut.parsePaginatedOrders(fakeApiEndpoint);
+        });
+
+        after(() => {
+            sut.getLastPage.restore();
+            sut.getJSONFromPage.restore();
+        });
 
         it("should return promise with the consolidated data from the paginated API", () => {
-            let expectedOrders = fakeOrdersPage1.concat(fakeOrdersPage2);
-            result.should.eventually.have.members(expectedOrders);
-            result.should.eventually.have.property("available_cookies", testData["available_cookies"]);
+            return result.should.eventually.have.property("orders").to.deep.equal([...fakeOrdersPage1, ...fakeOrdersPage2]);
+        });
+
+        it('should leverage the other functions in the module', (done) => {
+            result.then(() => {
+                 sut.getJSONFromPage.should.have.been.called;
+                 sut.getLastPage.should.have.been.called;
+                 sut.consolidatePagedOrders.should.have.been.called;
+                 done();
+            }).catch(done);
         });
     });
 });
