@@ -1,7 +1,7 @@
 const http = require('http');
 const PassThrough = require('stream').PassThrough;
 const testData = require ('./test-data');
-const sut = require('../app/order-api-handler');
+const sut = require('../app/shopify-api-handler');
 
 const sinon = require('sinon');
 const chai = require('chai');
@@ -101,7 +101,7 @@ describe("Shopify Paginated API Handler", () => {
     describe("parsePaginatedJSON", () => {
         let result;
 
-        const fakeApiEndpoint = "http://fakeapi.com/orders.json";
+        const shopUrl = "http://123fakeshop.com";
         const fakeOrdersPage1 = [{id: "fakeorder1"}];
         const fakeOrdersPage2 = [{id: "fakeorder2"}];
         
@@ -115,9 +115,9 @@ describe("Shopify Paginated API Handler", () => {
             const responsePage2 = new PassThrough();
             const responsePageBillion = new PassThrough();
 
-            httpGetStub.withArgs(`${fakeApiEndpoint}?page=1`).yields(responsePage1);
-            httpGetStub.withArgs(`${fakeApiEndpoint}?page=2`).yields(responsePage2);
-            httpGetStub.withArgs(`${fakeApiEndpoint}?page=1000000000`).yields(responsePageBillion);
+            httpGetStub.withArgs(`${shopUrl}/orders.json?page=1`).yields(responsePage1);
+            httpGetStub.withArgs(`${shopUrl}/orders.json?page=2`).yields(responsePage2);
+            httpGetStub.withArgs(`${shopUrl}/orders.json?page=1000000000`).yields(responsePageBillion);
 
             responsePage1.write(JSON.stringify(dataPage1));
             responsePage2.write(JSON.stringify(dataPage2));
@@ -130,11 +130,10 @@ describe("Shopify Paginated API Handler", () => {
             sinon.spy(sut, "getJSONFromPage");
             sinon.spy(sut, "consolidatePagedOrders");
             
-            result = sut.parsePaginatedOrders(fakeApiEndpoint);
+            result = sut.parsePaginatedOrders(shopUrl);
         });
 
         after(() => {
-            sut.getLastPage.restore();
             sut.getJSONFromPage.restore();
         });
 
