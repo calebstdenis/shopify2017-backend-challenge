@@ -1,5 +1,3 @@
-const testData = require('./test-data.json');
-
 const sut = require('../app/cookie-order-calculator');
 
 describe("Cookie Order Calulation Module", () => {

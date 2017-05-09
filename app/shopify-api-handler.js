@@ -1,5 +1,3 @@
-let R = require('ramda');
-
 exports.parsePaginatedOrders = function(jsonParser, shopUrl) {
     let pageParser = (pageNum) => jsonParser(`${shopUrl}/orders.json?page=${pageNum}`);
     return parsePages(pageParser).then(consolidatePagedOrders);
