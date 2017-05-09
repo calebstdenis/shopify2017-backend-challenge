@@ -1,4 +1,4 @@
-const sut = require('../app/shopify-api-handler');
+const sut = require('../app/shopify-api');
 let Promise = require('es6-promise').Promise;
 
 const sinon = require('sinon');

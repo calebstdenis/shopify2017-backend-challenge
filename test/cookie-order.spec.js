@@ -1,4 +1,4 @@
-const sut = require('../app/cookie-order-calculator');
+const sut = require('../app/cookie-order');
 
 describe("Cookie Order Calulation Module", () => {
     describe("calculateUnfulfillableCookieOrders", () => {

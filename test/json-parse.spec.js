@@ -1,4 +1,4 @@
-const sut = require('../app/json-api-parser');
+const sut = require('../app/json-parse');
 
 const http = require('http');
 const PassThrough = require('stream').PassThrough;
