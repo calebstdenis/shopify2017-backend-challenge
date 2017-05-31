@@ -4,12 +4,12 @@ exports.calculateUnfulfillableCookieOrders = function(orderData) {
     return R.pipe(
         () => orderData.orders,
         R.filter(hasCookies),
-        R.sortWith([ // https://github.com/ramda/ramda/commit/98908f92289dabd797770aca6c64bae1a96b0a9c
+        R.sortWith([ // https://github.com/ramda/ramda/commit/98908f92289dabd797770aca6c64bae1a96b0a9c O(nlogn)
             R.descend(numberOfCookies),
             R.ascend(R.prop("id"))
         ]),
         R.reduce(toUnfulfillableOrders, { // This is probably abuse of the "reduce" function.
-            remaining_cookies: orderData.available_cookies,
+            remaining_cookies: orderData.available_cookies, //could be optimized if needed
             unfulfilled_orders: []
         }),
         R.evolve({

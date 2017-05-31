@@ -15,7 +15,7 @@ let parsePages = async function(parsePage, accumulatedPages, currentPageNum) {
         return accumulatedPages;
     }
     else {
-        return parsePages(parsePage, accumulatedPages, currentPageNum+1);
+        return parsePages(parsePage, accumulatedPages, currentPageNum+1); //tail-call optimization here
     }
 };
 
